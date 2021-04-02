@@ -22,7 +22,9 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  #开源软件包  1 写入版本 2 pub get 3 lib/main.dart import
   cupertino_icons: ^0.1.2
+  english_words: ^3.1.0
 
 dev_dependencies:
   flutter_test:
