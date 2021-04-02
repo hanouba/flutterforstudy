@@ -10,10 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final wordPair = new WordPair.random();
-    return MaterialApp(
-      title: "你好这是flutter",
-      home: new RandWords()
-    );
+    return MaterialApp(title: "你好这是flutter", home: new RandWords());
   }
 }
 
@@ -26,11 +23,12 @@ class RandWords extends StatefulWidget {
 }
 
 class RandWordsState extends State<RandWords> {
-
   //字母列表保存
   final _suggestions = <WordPair>[];
+
   //字母大小控制
   final _biggerFont = const TextStyle(fontSize: 18.0);
+
   //收藏
   final _saved = new Set<WordPair>();
 
@@ -42,10 +40,13 @@ class RandWordsState extends State<RandWords> {
 
     return new Scaffold(
       appBar: new AppBar(
-          title: new Text("listview "),
-        ),
-        body: _buildSuggestions(),
-      );
+        title: new Text("listview "),
+        actions: <Widget>[
+          new IconButton(icon: new Icon(Icons.list), onPressed: _pushSaved)
+        ],
+      ),
+      body: _buildSuggestions(),
+    );
   }
 
   Widget _buildSuggestions() {
@@ -53,17 +54,17 @@ class RandWordsState extends State<RandWords> {
         padding: const EdgeInsets.all(16.0),
         itemBuilder: (context, i) {
           // 在每一列之前，添加一个1像素高的分隔线widget
-          if(i.isOdd) return new Divider();
+          if (i.isOdd) return new Divider();
           // 语法 "i ~/ 2" 表示i除以2，但返回值是整形（向下取整），比如i为：1, 2, 3, 4, 5
           // 时，结果为0, 1, 1, 2, 2， 这可以计算出ListView中减去分隔线后的实际单词对数量
-          final index = i ~/2 ;
+          final index = i ~/ 2;
           if (index >= _suggestions.length) {
             _suggestions.addAll(generateWordPairs().take(10));
           }
           return _buildRow(_suggestions[index]);
         });
-
   }
+
 //样式  收藏
   Widget _buildRow(WordPair pair) {
     //在 _buildRow 方法中添加 alreadySaved来检查确保单词对还没有添加到收藏夹中。
@@ -78,12 +79,12 @@ class RandWordsState extends State<RandWords> {
         alreadSaved ? Icons.favorite : Icons.favorite_border,
         color: alreadSaved ? Colors.red : null,
       ),
-      onTap: (){
+      onTap: () {
         //提示: 在Flutter的响应式风格的框架中，调用setState() 会为State对象触发build()方法，从而导致对UI的更新
         setState(() {
           if (alreadSaved) {
             _saved.remove(pair);
-          }else {
+          } else {
             _saved.add(pair);
           }
         });
@@ -91,5 +92,35 @@ class RandWordsState extends State<RandWords> {
     );
   }
 
+  //跳转到收藏界面
+  void _pushSaved() {
+    //建立一个路由并将其推入到导航管理器栈中
+    Navigator.of(context).push(
+      new MaterialPageRoute(
+        builder: (context) {
+          final tiles = _saved.map(
+            (pair) {
+              return new ListTile(
+                title: new Text(
+                  pair.asPascalCase,
+                  style: _biggerFont,
+                ),
+              );
+            },
+          );
+          final divided = ListTile.divideTiles(
+            context: context,
+            tiles: tiles,
+          ).toList();
 
+          return new Scaffold(
+            appBar: new AppBar(
+              title: new Text('Saved Suggestions'),
+            ),
+            body: new ListView(children: divided),
+          );
+        },
+      ),
+    );
+  }
 }
